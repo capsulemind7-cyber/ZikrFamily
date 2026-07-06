@@ -78,3 +78,4 @@ Quyidagilar hali kodlashtirilmagan — alohida so'rov bilan qo'shib boriladi:
 ## Muammo yuzaga kelsa
 
 Xatolik matnini (screenshot yoki nusxa) Claude'ga yuboring — birga hal qilamiz.
+
