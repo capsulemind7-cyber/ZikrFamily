@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #F1F5F9;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(56, 96, 168, 0.55), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 90% 20%, rgba(30, 58, 95, 0.6), transparent 55%),
+    linear-gradient(180deg, #14243b 0%, #0d1a2e 45%, #0a1526 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.card-surface {
+  background: rgba(15, 20, 30, 0.72);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+@keyframes pulse-count {
+  0% { transform: scale(1); }
+  35% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+.pulse-count {
+  animation: pulse-count 220ms ease-out;
+}
+
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.85) translateY(6px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.pop-in {
+  animation: pop-in 260ms ease-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
