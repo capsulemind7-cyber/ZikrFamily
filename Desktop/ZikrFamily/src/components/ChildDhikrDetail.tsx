@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { ArrowLeft, Keyboard } from 'lucide-react';
-import { AssignmentWithLog } from '../types';
+import { AssignmentWithLog, BadgeType } from '../types';
 import { ensureTodayLog, incrementLog, setLogCount } from '../hooks/useChildAssignments';
+import { addXp, evaluateStreak } from '../hooks/useGamification';
+
+const BADGE_LABELS: Record<BadgeType, { emoji: string; label: string }> = {
+  bronze_7: { emoji: '🥉', label: '7 kun ketma-ket!' },
+  silver_30: { emoji: '🥈', label: '30 kun ketma-ket!' },
+  gold_100: { emoji: '🥇', label: '100 kun ketma-ket!' },
+};
 
 export default function ChildDhikrDetail({
   assignment,
@@ -17,6 +24,7 @@ export default function ChildDhikrDetail({
   const [manualOpen, setManualOpen] = useState(false);
   const [manualValue, setManualValue] = useState('');
   const [celebrate, setCelebrate] = useState(false);
+  const [earnedBadge, setEarnedBadge] = useState<BadgeType | null>(null);
 
   const target = assignment.daily_target;
   const done = log?.count_done ?? 0;
@@ -37,9 +45,15 @@ export default function ChildDhikrDetail({
     if (updated) {
       const justCompleted = !wasCompleted && updated.completed;
       setLog(updated);
+      await addXp(childId, 1);
       if (justCompleted) {
         setCelebrate(true);
         setTimeout(() => setCelebrate(false), 1800);
+        const result = await evaluateStreak(childId);
+        if (result.newBadges.length > 0) {
+          setEarnedBadge(result.newBadges[0]);
+          setTimeout(() => setEarnedBadge(null), 2500);
+        }
       }
     }
   }
@@ -54,8 +68,23 @@ export default function ChildDhikrDetail({
     }
     if (!currentLog) return;
 
+    const previousDone = currentLog.count_done;
     const updated = await setLogCount(currentLog.id, num, target);
-    if (updated) setLog(updated);
+    if (updated) {
+      setLog(updated);
+      const delta = num - previousDone;
+      if (delta > 0) await addXp(childId, delta);
+      const justCompleted = !wasCompleted && updated.completed;
+      if (justCompleted) {
+        setCelebrate(true);
+        setTimeout(() => setCelebrate(false), 1800);
+        const result = await evaluateStreak(childId);
+        if (result.newBadges.length > 0) {
+          setEarnedBadge(result.newBadges[0]);
+          setTimeout(() => setEarnedBadge(null), 2500);
+        }
+      }
+    }
     setManualOpen(false);
     setManualValue('');
   }
@@ -121,6 +150,16 @@ export default function ChildDhikrDetail({
             <div className="text-6xl mb-3">🎉</div>
             <div className="text-2xl font-bold text-accent">Barakalla!</div>
             <div className="text-slate-300 mt-1">Zikr bajarildi</div>
+          </div>
+        </div>
+      )}
+
+      {earnedBadge && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
+          <div className="pop-in text-center">
+            <div className="text-7xl mb-3">{BADGE_LABELS[earnedBadge].emoji}</div>
+            <div className="text-2xl font-bold text-accent">Yangi medal!</div>
+            <div className="text-slate-300 mt-1">{BADGE_LABELS[earnedBadge].label}</div>
           </div>
         </div>
       )}

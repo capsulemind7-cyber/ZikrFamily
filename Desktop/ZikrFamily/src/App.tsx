@@ -13,6 +13,8 @@ import AdminChildrenScreen from './components/admin/AdminChildrenScreen';
 import AdminChildDetailScreen from './components/admin/AdminChildDetailScreen';
 import AdminZikrsScreen from './components/admin/AdminZikrsScreen';
 import AdminReportsScreen from './components/admin/AdminReportsScreen';
+import AdminRewardsScreen from './components/admin/AdminRewardsScreen';
+import ChildLeaderboardScreen from './components/ChildLeaderboardScreen';
 import { Child, AssignmentWithLog } from './types';
 
 type PublicScreen = 'role' | 'parentAuth' | 'childSelect' | 'childPin';
@@ -24,6 +26,7 @@ export default function App() {
   const [publicScreen, setPublicScreen] = useState<PublicScreen>('role');
   const [pendingChild, setPendingChild] = useState<Child | null>(null);
   const [openAssignment, setOpenAssignment] = useState<AssignmentWithLog | null>(null);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   const [adminTab, setAdminTab] = useState<AdminTab>('dashboard');
   const [adminSelectedChild, setAdminSelectedChild] = useState<Child | null>(null);
@@ -38,6 +41,14 @@ export default function App() {
 
   // ---------- FARZAND SESSIYASI FAOL ----------
   if (activeChild) {
+    if (showLeaderboard) {
+      return (
+        <ChildLeaderboardScreen
+          familyId={activeChild.family_id}
+          onBack={() => setShowLeaderboard(false)}
+        />
+      );
+    }
     if (openAssignment) {
       return (
         <ChildDhikrDetail
@@ -51,6 +62,7 @@ export default function App() {
       <ChildDhikrHome
         child={activeChild}
         onOpenAssignment={(a) => setOpenAssignment(a)}
+        onOpenLeaderboard={() => setShowLeaderboard(true)}
         onLogout={() => {
           logoutChild();
           setPublicScreen('role');
@@ -80,6 +92,7 @@ export default function App() {
         )}
         {adminTab === 'zikrs' && <AdminZikrsScreen />}
         {adminTab === 'reports' && <AdminReportsScreen />}
+        {adminTab === 'rewards' && <AdminRewardsScreen />}
       </AdminLayout>
     );
   }

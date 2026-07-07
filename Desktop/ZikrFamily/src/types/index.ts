@@ -15,6 +15,34 @@ export interface Child {
   pin_code: string;
   birth_year: number | null;
   created_at: string;
+  total_xp: number;
+  current_streak_days: number;
+  longest_streak_days: number;
+  last_streak_date: string | null;
+}
+
+export type BadgeType = 'bronze_7' | 'silver_30' | 'gold_100';
+
+export interface Badge {
+  id: string;
+  child_id: string;
+  badge_type: BadgeType;
+  earned_at: string;
+}
+
+export type RewardThresholdType = 'total_zikr_count' | 'streak_days';
+
+export interface Reward {
+  id: string;
+  family_id: string;
+  child_id: string | null;
+  title: string;
+  threshold_type: RewardThresholdType;
+  threshold_value: number;
+  achieved_at: string | null;
+  claimed: boolean;
+  claimed_at: string | null;
+  created_at: string;
 }
 
 export interface Zikr {

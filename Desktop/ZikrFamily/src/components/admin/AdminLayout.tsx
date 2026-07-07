@@ -1,14 +1,15 @@
 import { ReactNode } from 'react';
-import { LayoutDashboard, Users, BookOpen, ClipboardCheck, LogOut } from 'lucide-react';
-import { useAuth } from "../../contexts/AuthContext";
+import { LayoutDashboard, Users, BookOpen, ClipboardCheck, Gift, LogOut } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
-export type AdminTab = 'dashboard' | 'children' | 'zikrs' | 'reports';
+export type AdminTab = 'dashboard' | 'children' | 'zikrs' | 'reports' | 'rewards';
 
 const TABS: { key: AdminTab; label: string; icon: any }[] = [
   { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { key: 'children', label: 'Farzandlar', icon: Users },
   { key: 'zikrs', label: 'Zikrlar', icon: BookOpen },
-  { key: 'reports', label: 'Hisobotlar', icon: ClipboardCheck },
+  { key: 'reports', label: 'Hisobot', icon: ClipboardCheck },
+  { key: 'rewards', label: 'Mukofot', icon: Gift },
 ];
 
 export default function AdminLayout({

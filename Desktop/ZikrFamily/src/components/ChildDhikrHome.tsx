@@ -1,7 +1,15 @@
-import { useMemo, useState } from 'react';
-import { LogOut, Star } from 'lucide-react';
-import { Child, AssignmentWithLog, Category } from '../types';
+import { useEffect, useMemo, useState } from 'react';
+import { LogOut, Star, Flame, Trophy } from 'lucide-react';
+import { Child, AssignmentWithLog, Category, Badge } from '../types';
 import { useChildAssignments } from '../hooks/useChildAssignments';
+import { resetStreakIfMissed } from '../hooks/useGamification';
+import { supabase } from '../lib/supabase';
+
+const BADGE_EMOJI: Record<string, string> = {
+  bronze_7: '🥉',
+  silver_30: '🥈',
+  gold_100: '🥇',
+};
 
 type Filter = 'barchasi' | Category;
 
@@ -15,13 +23,39 @@ export default function ChildDhikrHome({
   child,
   onOpenAssignment,
   onLogout,
+  onOpenLeaderboard,
 }: {
   child: Child;
   onOpenAssignment: (a: AssignmentWithLog) => void;
   onLogout: () => void;
+  onOpenLeaderboard: () => void;
 }) {
   const { items, loading } = useChildAssignments(child.id);
   const [filter, setFilter] = useState<Filter>('barchasi');
+  const [badges, setBadges] = useState<Badge[]>([]);
+  const [streak, setStreak] = useState(child.current_streak_days);
+  const [xp, setXp] = useState(child.total_xp);
+
+  useEffect(() => {
+    resetStreakIfMissed(child.id).then(() => {
+      supabase
+        .from('children')
+        .select('current_streak_days, total_xp')
+        .eq('id', child.id)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setStreak((data as any).current_streak_days);
+            setXp((data as any).total_xp);
+          }
+        });
+    });
+    supabase
+      .from('badges')
+      .select('*')
+      .eq('child_id', child.id)
+      .then(({ data }) => setBadges((data as Badge[]) ?? []));
+  }, [child.id]);
 
   const filtered = useMemo(() => {
     if (filter === 'barchasi') return items;
@@ -49,9 +83,40 @@ export default function ChildDhikrHome({
             <div className="text-xs text-slate-400">Assalomu alaykum!</div>
           </div>
         </div>
-        <button onClick={onLogout} className="text-slate-400">
-          <LogOut size={20} />
-        </button>
+        <div className="flex items-center gap-3">
+          <button onClick={onOpenLeaderboard} className="text-slate-400">
+            <Trophy size={20} />
+          </button>
+          <button onClick={onLogout} className="text-slate-400">
+            <LogOut size={20} />
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 mb-5">
+        <div className="card-surface rounded-xl2 p-3 text-center">
+          <div className="text-xl font-extrabold text-accent">{xp}</div>
+          <div className="text-[11px] text-slate-400">XP ball</div>
+        </div>
+        <div className="card-surface rounded-xl2 p-3 text-center flex flex-col items-center">
+          <div className="flex items-center gap-1 text-xl font-extrabold text-orange-400">
+            <Flame size={18} /> {streak}
+          </div>
+          <div className="text-[11px] text-slate-400">kunlik streak</div>
+        </div>
+        <div className="card-surface rounded-xl2 p-3 text-center">
+          <div className="text-xl">
+            {(['bronze_7', 'silver_30', 'gold_100'] as const).map((bt) => (
+              <span
+                key={bt}
+                className={badges.some((b) => b.badge_type === bt) ? '' : 'opacity-20 grayscale'}
+              >
+                {BADGE_EMOJI[bt]}
+              </span>
+            ))}
+          </div>
+          <div className="text-[11px] text-slate-400">medallar</div>
+        </div>
       </div>
 
       <div className="card-surface rounded-xl2 p-5 mb-5">
