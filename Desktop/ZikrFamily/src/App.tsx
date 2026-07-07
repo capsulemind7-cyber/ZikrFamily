@@ -15,21 +15,24 @@ import AdminZikrsScreen from './components/admin/AdminZikrsScreen';
 import AdminReportsScreen from './components/admin/AdminReportsScreen';
 import AdminRewardsScreen from './components/admin/AdminRewardsScreen';
 import ChildLeaderboardScreen from './components/ChildLeaderboardScreen';
+import ChatScreen from './components/ChatScreen';
 import { Child, AssignmentWithLog } from './types';
 
 type PublicScreen = 'role' | 'parentAuth' | 'childSelect' | 'childPin';
 
 export default function App() {
-  const { user, loading } = useAuth();
+  const { user, loading, family } = useAuth();
   const { activeChild, setActiveChild, logoutChild } = useChildSession();
 
   const [publicScreen, setPublicScreen] = useState<PublicScreen>('role');
   const [pendingChild, setPendingChild] = useState<Child | null>(null);
   const [openAssignment, setOpenAssignment] = useState<AssignmentWithLog | null>(null);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [childChatOpen, setChildChatOpen] = useState(false);
 
   const [adminTab, setAdminTab] = useState<AdminTab>('dashboard');
   const [adminSelectedChild, setAdminSelectedChild] = useState<Child | null>(null);
+  const [adminChatChild, setAdminChatChild] = useState<Child | null>(null);
 
   if (loading) {
     return (
@@ -41,6 +44,17 @@ export default function App() {
 
   // ---------- FARZAND SESSIYASI FAOL ----------
   if (activeChild) {
+    if (childChatOpen) {
+      return (
+        <ChatScreen
+          familyId={activeChild.family_id}
+          childId={activeChild.id}
+          asRole="child"
+          title="Ota-onam bilan suhbat"
+          onBack={() => setChildChatOpen(false)}
+        />
+      );
+    }
     if (showLeaderboard) {
       return (
         <ChildLeaderboardScreen
@@ -63,6 +77,7 @@ export default function App() {
         child={activeChild}
         onOpenAssignment={(a) => setOpenAssignment(a)}
         onOpenLeaderboard={() => setShowLeaderboard(true)}
+        onOpenChat={() => setChildChatOpen(true)}
         onLogout={() => {
           logoutChild();
           setPublicScreen('role');
@@ -73,6 +88,17 @@ export default function App() {
 
   // ---------- OTA-ONA TIZIMGA KIRGAN ----------
   if (user) {
+    if (adminChatChild && family) {
+      return (
+        <ChatScreen
+          familyId={family.id}
+          childId={adminChatChild.id}
+          asRole="parent"
+          title={adminChatChild.name}
+          onBack={() => setAdminChatChild(null)}
+        />
+      );
+    }
     if (adminSelectedChild) {
       return (
         <AdminChildDetailScreen
@@ -88,7 +114,10 @@ export default function App() {
           <AdminDashboardScreen onOpenChild={(c) => setAdminSelectedChild(c)} />
         )}
         {adminTab === 'children' && (
-          <AdminChildrenScreen onOpenChild={(c) => setAdminSelectedChild(c)} />
+          <AdminChildrenScreen
+            onOpenChild={(c) => setAdminSelectedChild(c)}
+            onOpenChat={(c) => setAdminChatChild(c)}
+          />
         )}
         {adminTab === 'zikrs' && <AdminZikrsScreen />}
         {adminTab === 'reports' && <AdminReportsScreen />}

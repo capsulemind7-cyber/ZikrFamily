@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { LogOut, Star, Flame, Trophy } from 'lucide-react';
+import { LogOut, Star, Flame, Trophy, MessageCircle } from 'lucide-react';
 import { Child, AssignmentWithLog, Category, Badge } from '../types';
 import { useChildAssignments } from '../hooks/useChildAssignments';
 import { resetStreakIfMissed } from '../hooks/useGamification';
@@ -24,11 +24,13 @@ export default function ChildDhikrHome({
   onOpenAssignment,
   onLogout,
   onOpenLeaderboard,
+  onOpenChat,
 }: {
   child: Child;
   onOpenAssignment: (a: AssignmentWithLog) => void;
   onLogout: () => void;
   onOpenLeaderboard: () => void;
+  onOpenChat: () => void;
 }) {
   const { items, loading } = useChildAssignments(child.id);
   const [filter, setFilter] = useState<Filter>('barchasi');
@@ -84,6 +86,9 @@ export default function ChildDhikrHome({
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <button onClick={onOpenChat} className="text-slate-400">
+            <MessageCircle size={20} />
+          </button>
           <button onClick={onOpenLeaderboard} className="text-slate-400">
             <Trophy size={20} />
           </button>

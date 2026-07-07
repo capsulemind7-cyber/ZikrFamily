@@ -8,7 +8,8 @@ Oilaviy zikr kuzatuv ilovasi (PWA). Ota-ona farzandlarga kunlik zikr topshiriqla
 2. Chap menyudan **SQL Editor** ni oching.
 3. `supabase/migrations/001_init.sql` faylining butun tarkibini nusxalab, SQL Editor'ga joylab, **Run** tugmasini bosing.
 4. Keyin `supabase/migrations/002_gamification.sql` faylini ham xuddi shunday nusxalab, **Run** qiling (XP, streak, medal, mukofot jadvallari uchun).
-5. Chap menyudan **Project Settings → API** ga o'ting, `Project URL` va `anon public` kalitni nusxalang.
+5. Keyin `supabase/migrations/003_chat.sql` faylini ham ishga tushiring (oilaviy chat uchun).
+6. Chap menyudan **Project Settings → API** ga o'ting, `Project URL` va `anon public` kalitni nusxalang.
 
 ## 2. Loyihani mahalliy ishga tushirish
 
@@ -70,15 +71,15 @@ Vercel'da:
 - **Medallar** — 🥉7 kun, 🥈30 kun, 🥇100 kun ketma-ket bajarilganda avtomatik beriladi
 - **Haftalik reyting** — farzandlar orasida shu hafta yig'ilgan XP bo'yicha
 - **Mukofotlar** — ota-ona shart belgilaydi (masalan "1000 zikr → Muzqaymoq"), shart bajarilganda farzand ekranida va admin panelda ko'rinadi, "berdim" deb belgilanadi
+- **Oilaviy chat** — ota-ona va har bir farzand o'rtasida alohida, faqat matnli (ovozsiz), real vaqtda yangilanadigan suhbat, o'qilmagan xabarlar soni bilan
+- **Tarix/kalendar** — Hisobotlar bo'limida "Tarix (30 kun)" tugmasi orqali, har bir kun uchun rangli belgi (🟢 barchasi bajarildi, 🟡 qisman, 🔴 bajarilmadi)
 - PWA (o'rnatiladigan ilova, offline-ready asos)
 
 ## 6. Keyingi bosqichda qo'shiladigan imkoniyatlar
 
 Quyidagilar hali kodlashtirilmagan — alohida so'rov bilan qo'shib boriladi:
-- Oilaviy chat (ota-ona ↔ farzand)
 - Lokatsiya (check-in uslubida)
 - Bildirishnoma eslatmalari
-- Kalendar/tarix ko'rinishi (oxirgi 30 kun)
 
 ## Muammo yuzaga kelsa
 

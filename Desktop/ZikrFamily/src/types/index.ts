@@ -45,6 +45,27 @@ export interface Reward {
   created_at: string;
 }
 
+export type SenderType = 'parent' | 'child';
+
+export interface Message {
+  id: string;
+  family_id: string;
+  child_id: string;
+  sender_type: SenderType;
+  message_text: string;
+  created_at: string;
+  read_at: string | null;
+}
+
+export type DayStatus = 'green' | 'yellow' | 'red' | 'none';
+
+export interface HistoryDay {
+  date: string;
+  status: DayStatus;
+  done: number;
+  total: number;
+}
+
 export interface Zikr {
   id: string;
   title: string;

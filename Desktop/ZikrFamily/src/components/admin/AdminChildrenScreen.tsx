@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { Plus, ChevronRight, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Plus, ChevronRight, X, MessageCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useFamilyChildren } from '../../hooks/useAdminData';
+import { fetchUnreadCounts } from '../../hooks/useChat';
 import { supabase } from '../../lib/supabase';
 import { Child } from '../../types';
 
@@ -9,11 +10,22 @@ const EMOJIS = ['👦', '👧', '🧒', '👶'];
 
 export default function AdminChildrenScreen({
   onOpenChild,
+  onOpenChat,
 }: {
   onOpenChild: (child: Child) => void;
+  onOpenChat: (child: Child) => void;
 }) {
   const { family } = useAuth();
   const { children, loading, reload } = useFamilyChildren(family?.id);
+  const [unread, setUnread] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (!family || children.length === 0) return;
+    fetchUnreadCounts(
+      family.id,
+      children.map((c) => c.id)
+    ).then(setUnread);
+  }, [family, children]);
   const [modalOpen, setModalOpen] = useState(false);
   const [name, setName] = useState('');
   const [emoji, setEmoji] = useState(EMOJIS[0]);
@@ -67,20 +79,34 @@ export default function AdminChildrenScreen({
 
       <div className="space-y-3">
         {children.map((c) => (
-          <button
+          <div
             key={c.id}
-            onClick={() => onOpenChild(c)}
-            className="w-full card-surface rounded-xl2 p-4 flex items-center gap-4 text-left"
+            className="w-full card-surface rounded-xl2 p-4 flex items-center gap-4"
           >
-            <div className="w-12 h-12 rounded-full bg-blue-500/30 flex items-center justify-center text-xl">
-              {c.avatar_emoji || c.name.charAt(0).toUpperCase()}
-            </div>
-            <div className="flex-1">
-              <div className="font-semibold">{c.name}</div>
-              <div className="text-xs text-slate-400">PIN: {c.pin_code}</div>
-            </div>
-            <ChevronRight className="text-slate-500" size={20} />
-          </button>
+            <button
+              onClick={() => onOpenChild(c)}
+              className="flex items-center gap-4 flex-1 text-left"
+            >
+              <div className="w-12 h-12 rounded-full bg-blue-500/30 flex items-center justify-center text-xl">
+                {c.avatar_emoji || c.name.charAt(0).toUpperCase()}
+              </div>
+              <div className="flex-1">
+                <div className="font-semibold">{c.name}</div>
+                <div className="text-xs text-slate-400">PIN: {c.pin_code}</div>
+              </div>
+            </button>
+            <button onClick={() => onOpenChat(c)} className="relative text-slate-400 p-2">
+              <MessageCircle size={20} />
+              {unread[c.id] > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                  {unread[c.id]}
+                </span>
+              )}
+            </button>
+            <button onClick={() => onOpenChild(c)}>
+              <ChevronRight className="text-slate-500" size={20} />
+            </button>
+          </div>
         ))}
       </div>
 
