@@ -36,7 +36,11 @@ export function useChat(familyId: string | undefined, childId: string | undefine
           filter: `child_id=eq.${childId}`,
         },
         (payload) => {
-          setMessages((prev) => [...prev, payload.new as Message]);
+          const incoming = payload.new as Message;
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === incoming.id)) return prev;
+            return [...prev, incoming];
+          });
         }
       )
       .subscribe();
@@ -48,12 +52,27 @@ export function useChat(familyId: string | undefined, childId: string | undefine
 
   async function sendMessage(sender: SenderType, text: string) {
     if (!familyId || !childId || !text.trim()) return;
-    await supabase.from('messages').insert({
-      family_id: familyId,
-      child_id: childId,
-      sender_type: sender,
-      message_text: text.trim(),
-    });
+    const { data, error } = await supabase
+      .from('messages')
+      .insert({
+        family_id: familyId,
+        child_id: childId,
+        sender_type: sender,
+        message_text: text.trim(),
+      })
+      .select()
+      .single();
+
+    if (!error && data) {
+      const inserted = data as Message;
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === inserted.id)) return prev;
+        return [...prev, inserted];
+      });
+    } else if (error) {
+      // eslint-disable-next-line no-console
+      console.error('Xabar yuborishda xatolik:', error.message);
+    }
   }
 
   return { messages, loading, sendMessage, reload: load };
